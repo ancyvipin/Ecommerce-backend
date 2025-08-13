@@ -22,7 +22,7 @@ class StoreProductRequest extends FormRequest
             // Price must be a number and cannot be negative.
             'prdt_price' => 'required|numeric|min:1',
             // Stock must be an integer and cannot be negative.
-            'stock_quantity' => 'required|integer|min:0',
+            'stock_quantity' => 'required|integer|min:1',
         ];
     }
 }
