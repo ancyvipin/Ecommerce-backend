@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('user_email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('user_password');
-            $table->string('mobile', 15);
+            $table->string('mobile', 25);
             $table->string('shipping_address_line_1')->nullable();
             $table->string('shipping_address_line_2')->nullable();
             $table->string('shipping_city')->nullable();

@@ -26,7 +26,10 @@ class UpdateProductRequest extends FormRequest
         $productId = $this->route('product')->prdt_id;
 
         return [
+<<<<<<< HEAD
             // 'sometimes' means only validate this field if it's present in the request.
+=======
+>>>>>>> 141a7ee (Updated project with new controllers, requests, factories, and migrations)
             'prdt_name' => [
                 'sometimes',
                 'required',

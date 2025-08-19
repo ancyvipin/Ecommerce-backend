@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class FrequencyReportRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,14 +22,11 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_email' => 'required|email|exists:users,user_email',
-            'user_password' => 'required|string',
-        ];
-    }
-    public function messages(): array
-    {
-        return [
-            'user_email.exists' => 'Email address not found.',
+            
+            'from_date' => 'nullable|date',
+            'to_date'   => 'nullable|date|after_or_equal:from_date',
+            // Add an optional limit to get the top N products
+            'limit'     => 'nullable|integer|min:1|max:100',
         ];
     }
 }

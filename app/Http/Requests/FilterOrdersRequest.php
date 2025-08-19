@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class FilterOrdersRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+       return auth()->check();
     }
 
     /**
@@ -22,14 +22,14 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_email' => 'required|email|exists:users,user_email',
-            'user_password' => 'required|string',
+            'from_date'=>'nullable|date',
+            'to_date'=>'nullable|date|after_or_equal:from_date',
         ];
     }
     public function messages(): array
     {
         return [
-            'user_email.exists' => 'Email address not found.',
+            'to_date.after_or_equal' => 'The "to date" must be a date after or equal to the "from date".',
         ];
     }
 }
