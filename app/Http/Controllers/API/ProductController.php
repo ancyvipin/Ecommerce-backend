@@ -8,6 +8,9 @@ use App\Models\Product;
 use App\Http\Resources\ProductResource;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Requests\FrequencyReportRequest;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -55,7 +58,45 @@ class ProductController extends Controller
         return new ProductResource($product);
     }
 
+    public function productsToRefill()
+    {
+        // Use whereColumn to efficiently compare two columns from the same table.
+        $products = Product::whereColumn('stock_quantity', '<=', 'refill_prdts')->get();
 
+        return ProductResource::collection($products);
+    }
+
+      public function frequentlyPurchased(FrequencyReportRequest $request)
+    {
+        $validated = $request->validated();
+        $limit = $validated['limit'] ?? 10;
+
+        $query = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.order_id')
+            ->join('products', 'order_items.prdt_id', '=', 'products.prdt_id')
+            ->select(
+                'products.prdt_id',
+                'products.prdt_name',
+                DB::raw('SUM(order_items.item_quantity) as total_quantity_sold')
+            )
+            // Important: Also filter out soft-deleted products from the report
+            ->whereNull('orders.deleted_at')
+            ->whereNull('products.deleted_at');
+
+        if (isset($validated['from_date'])) {
+            $query->whereDate('orders.created_at', '>=', $validated['from_date']);
+        }
+        if (isset($validated['to_date'])) {
+            $query->whereDate('orders.created_at', '<=', $validated['to_date']);
+        }
+
+        $frequentProducts = $query->groupBy('products.prdt_id', 'products.prdt_name')
+            ->orderBy('total_quantity_sold', 'desc')
+            ->limit($limit)
+            ->get();
+
+        return response()->json($frequentProducts);
+    }
     /**
      * Remove the specified resource from storage.
      */

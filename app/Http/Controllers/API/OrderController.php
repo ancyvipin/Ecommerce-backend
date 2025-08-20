@@ -75,4 +75,28 @@ class OrderController extends Controller
             return response()->json(['message' => 'An unexpected error occurred while placing your order.'], 500);
         }
     }
+     public function destroy(Order $order): JsonResponse
+    {
+        
+
+        // --- Important Business Logic ---
+        // When an order is cancelled, we should return the purchased items back to stock.
+        // A transaction ensures this happens safely.
+        DB::transaction(function () use ($order) {
+            // 1. Restore stock for each item in the order.
+            foreach ($order->items as $item) {
+                Product::find($item->prdt_id)->increment('stock_quantity', $item->item_quantity);
+            }
+
+            // 2. You might want to update the order's status to 'cancelled'.
+            $order->status = 'cancelled';
+            $order->save();
+
+            // 3. Perform the soft delete.
+            // The SoftDeletes trait ensures this sets the `deleted_at` timestamp.
+            $order->delete();
+        });
+
+        return response()->json(['message' => 'Order successfully cancelled.']);
+    }
 }

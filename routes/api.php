@@ -40,6 +40,5 @@ Route::get('/products/reports/frequently-purchased', [ProductController::class, 
     Route::put('/orders/{order}',[OrderController::class,'update']);
     Route::delete('/orders/{order}',[OrderController::class,'destroy']);
     Route::delete('/orders/{order}/item/{item}',[OrderController::class,'destroyItem']);
-
     
 });
