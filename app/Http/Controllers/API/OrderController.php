@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderRequest; // <-- Use our powerful request
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -72,14 +73,18 @@ class OrderController extends Controller
 
         } catch (\Exception $e) {
             // This will catch any unexpected database or other errors.
-            return response()->json(['message' => 'An unexpected error occurred while placing your order.'], 500);
+            //return response()->json(['message' => 'An unexpected error occurred while placing your order.'], 500);
+
+             return response()->json([
+            'message' => 'An unexpected error occurred while placing your order.',
+            'error' => $e->getMessage(), // Show the real error
+            'trace' => $e->getTraceAsString() // Optional: show the full stack trace
+            ], 500);
         }
+
     }
      public function destroy(Order $order): JsonResponse
     {
-        
-
-        // --- Important Business Logic ---
         // When an order is cancelled, we should return the purchased items back to stock.
         // A transaction ensures this happens safely.
         DB::transaction(function () use ($order) {
@@ -99,4 +104,39 @@ class OrderController extends Controller
 
         return response()->json(['message' => 'Order successfully cancelled.']);
     }
+
+     public function destroyItem(Order $order, OrderItem $item): OrderResource|JsonResponse
+    {
+        // --- Authorization (Very Important!) ---
+        // 1. Ensure the user owns the parent order.
+        // abort_if(request()->user()->cannot('update', $order), 403);
+
+        // 2. Ensure the item actually belongs to the specified order.
+        // This prevents a user from deleting an item from someone else's order
+        // by mixing and matching IDs in the URL.
+        if ($item->order_id !== $order->order_id) {
+            return response()->json(['message' => 'Item does not belong to this order.'], 422);
+        }
+
+        DB::transaction(function () use ($order, $item) {
+            // 1. Find the associated product and restore its stock.
+            $product = Product::find($item->prdt_id);
+            if ($product) {
+                $product->increment('stock_quantity', $item->item_quantity);
+            }
+
+            // 2. Recalculate the order's total amount by subtracting the removed item's value.
+            $itemValue = $item->item_price * $item->item_quantity;
+            $order->total_amount -= $itemValue;
+            $order->save();
+
+            // 3. Perform the soft delete on the item itself.
+            $item->delete();
+        });
+
+        // Return the updated parent order with its remaining items.
+        return new OrderResource($order->load('items'));
+    }
+
+
 }
