@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class order extends Model
 {
-    use HasFactory,HasUuids;
+    use HasFactory,HasUuids,SoftDeletes;
      protected $primaryKey = 'order_id'; 
      protected $keyType = 'string';
      public $incrementing = false;
@@ -17,6 +18,7 @@ class order extends Model
         'user_id',
         'total_amount',
         'status',
+        'user_status_at_order'
     ];
      public function user()
     {

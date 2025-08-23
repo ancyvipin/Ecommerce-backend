@@ -6,15 +6,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable,HasApiTokens,HasUuids,SoftDeletes;
+    use HasFactory, Notifiable,HasApiTokens,HasUuids;
 
     /**
      * The attributes that are mass assignable.
@@ -34,8 +33,8 @@ class User extends Authenticatable
         'shipping_city',
         'shipping_state',
         'shipping_postal_code',
-        'shipping_country',
-        'status'
+        'shipping_country'
+
     ];
 
     /**
@@ -64,12 +63,5 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-    public function orders(): HasMany
-    {
-        // This tells Laravel:
-        // "A User has many Orders. The connection is through the 'user_id' column
-        // on the 'orders' table, which matches the 'user_id' column on this table."
-        return $this->hasMany(Order::class, 'user_id', 'user_id');
     }
 }

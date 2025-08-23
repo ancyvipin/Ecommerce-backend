@@ -19,15 +19,13 @@ class StoreProductRequest extends FormRequest
             // The product name must be provided and must be unique in the products table.
             'prdt_name' => 'required|string|max:255|unique:products,prdt_name',
             'prdt_description' => 'required|string',
-<<<<<<< HEAD
             // Price must be a number and cannot be negative.
             'prdt_price' => 'required|numeric|min:1',
             // Stock must be an integer and cannot be negative.
-=======
+            'stock_quantity' => 'required|integer|min:1',
         
             'prdt_price' => 'required|numeric|min:1',
      
->>>>>>> 141a7ee (Updated project with new controllers, requests, factories, and migrations)
             'stock_quantity' => 'required|integer|min:1',
         ];
     }

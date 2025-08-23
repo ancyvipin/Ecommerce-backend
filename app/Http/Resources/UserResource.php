@@ -18,10 +18,6 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'user_name' => $this->user_name,
             'user_email' => $this->user_email,
-<<<<<<< HEAD
-=======
-            'status' => $this->status,
->>>>>>> 141a7ee (Updated project with new controllers, requests, factories, and migrations)
             'mobile' => $this->mobile,
             'shipping_address' => [
                 'line1' => $this->shipping_address_line_1,
@@ -32,10 +28,6 @@ class UserResource extends JsonResource
                 'country' => $this->shipping_country,
             ],
             'created_at' => $this->created_at->toDateTimeString(),
-<<<<<<< HEAD
-=======
-            'deleted_at' => $this->when($this->trashed(), $this->deleted_at),
->>>>>>> 141a7ee (Updated project with new controllers, requests, factories, and migrations)
         ];
     }
 }
