@@ -68,6 +68,6 @@ class ProductController extends Controller
         $product->delete();
 
         // Return a confirmation response with a 200 OK status.
-        return response()->json(['message' => 'Product deleted successfully.'], 200);
+        return response()->json(['message' => 'Product are deleted successfully.'], 200);
     }
 }

@@ -14,7 +14,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Public routes
-//Route::get('/products', [ProductController::class, 'index']);
+ Route::get('/products', [ProductController::class, 'index']);
 
     // Protected routes (require authentication)
     Route::middleware('auth:api')->group(function () {
