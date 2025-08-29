@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use function Laravel\Prompts\password;
 
 class AuthController extends Controller
 {
@@ -19,18 +20,21 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
+        $validatedData=$request->validated();
+
         $user = User::create([
-            'user_name' => $request->user_name,
-            'user_email' => $request->user_email,
-            'user_password' => Hash::make($request->user_password),
-            'mobile' => $request->mobile,
-            'shipping_address_line_1' => $request->shipping_address_line_1,
-            'shipping_address_line_2' => $request->shipping_address_line_2,
-            'shipping_city' => $request->shipping_city,
-            'shipping_state' => $request->shipping_state,
-            'shipping_postal_code' => $request->shipping_postal_code,
-            'shipping_country' => $request->shipping_country,
-        ]);
+            'user_name' => $validatedData['user_name'],
+            'user_email' => $validatedData['user_email'],
+            'user_password' => Hash::make($validatedData['user_password']),
+            'mobile' => $validatedData['mobile'],
+        'shipping_address_line_1' => $validatedData['shipping_address_line_1'],
+        // Use array_key_exists for optional fields like this
+        'shipping_address_line_2' => array_key_exists('shipping_address_line_2', $validatedData) ? $validatedData['shipping_address_line_2'] : null,
+        'shipping_city' => $validatedData['shipping_city'],
+        'shipping_state' => $validatedData['shipping_state'],
+        'shipping_postal_code' => $validatedData['shipping_postal_code'],
+        'shipping_country' => $validatedData['shipping_country'],
+    ]);
 
         $token = $user->createToken('AppNameAuthToken')->accessToken;
 
@@ -46,13 +50,14 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = [
-            'user_email' => $request->user_email,
-            'password' => $request->user_password,
-        ];
+
+        $validated =$request->validated();
+        $credentials =$request->validated();
+        $credentials=['user_email' => $validated['user_email'],
+        'password'=> $validated['user_password'],];
 
         if (!Auth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized. Invalid credentials.'], 401);
+            return response()->json(['error' => 'password incorrect.'], 401);
         }
 
         $user = Auth::user();

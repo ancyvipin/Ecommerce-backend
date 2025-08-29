@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_items', function (Blueprint $table) {
-            // It's best practice to name all primary keys 'id' for consistency.
+            
             $table->uuid('item_id')->primary();
 
             // --- Product Link ---
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->uuid('prdt_id');
             $table->foreign('prdt_id')->references('prdt_id')->on('products')->onDelete('cascade');
 
-            // --- Order Link (THE FIX IS HERE) ---
+            
             // 1. Define the column that will hold the order's key
             $table->uuid('order_id');
             // 2. Tell it to reference the 'id' column on the 'orders' table.
